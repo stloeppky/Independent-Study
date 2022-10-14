@@ -85,7 +85,8 @@ x.lim <- range(cap.2021$MASS) # range for x axis
 y.lim <- range(cap.2021$SVL)  # range for y axis
 
 # make plot
-plot(NA, xlim = x.lim, ylim = y.lim, xlab = "Mass (gram?)", ylab = "SVL")
+plot(NA, xlim = x.lim, ylim = y.lim, xlab = "Mass (gram)", ylab = "Snoutt to Vent Length (cm)")
+
 # now plot using points females and then males
 points(female$MASS, female$SVL, col = "red", pch = 19)
 points(male$MASS, male$SVL, co = "purple", pch = 19)
@@ -93,18 +94,56 @@ points(male$MASS, male$SVL, co = "purple", pch = 19)
 # we got something going! keep on working with it.
 
 
+# trying to add trend lines to male vs female 
+abline(lm(female$SVL ~female$MASS), col = "red")
+abline(lm(male$SVL ~male$MASS), col = "purple")
 
-# getting this error message Warning message: In xy.coords(x, y, xlabel, ylabel, log) : NAs introduced by coercion
-# trying to solve 
+# so from this the male and female trends are super similar - obviously they are not linear so trying to figure
+#out how to change that 
 
-str(cap.2021)
+# curious about what the group is at the top as it seems to be both males and females 
+# the largest snakes in both length and mass are males 
 
-# hmmm why is mass a character? 
-# there are characters in the data 
+# can't figure out how to make a logorithmic regression line.... 
+
+# trying in ggplot because its easier for me to use for some reason 
+library(ggplot2)
+
+ggplot(cap.2021, aes(x = MASS, y = SVL)) +
+  geom_point(aes(colour = SEX)) + 
+  xlab("Mass (g)") +             
+  ylab("Snout to Vent Length (cm)") + 
+  scale_color_discrete("Sex") + 
+  geom_smooth(se = FALSE) # this does it for both F & M but trying to see how it might be different 
+
+
+# trying box plot? 
+
+ggplot(cap.2021, aes(x=MASS, y=SVL, fill = SEX)) + geom_boxplot()
+
+# trying to bin some data 
+
 library(dplyr)
-subset(cap.2021, MASS != "UNKNOWN") # tried this but it didnt seem to work 
 
-head(cap.2021)
+cap.2021 <- cap.2021 %>% mutate(MASS_bin = cut(MASS, breaks=10))
+
+# making a boxplot with the binned data 
+
+
+head(cap.2021) # MASS_
+ggplot(cap.2021, aes(x= MASS_bin, y = SVL, fill = SEX)) + geom_boxplot() +
+   theme(axis.text.x = element_text(angle = 90)) +
+  xlab("Mass (g)") +             
+  ylab("Snout to Vent Length (cm)") + 
+  scale_color_discrete("Sex")
+
+
+
+
+
+
+
+
 
 
 
